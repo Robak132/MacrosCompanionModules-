@@ -1,6 +1,16 @@
 import Utility from "./utility.mjs";
 
+/**
+ * A class representing a configurable dialog.
+ * @extends Dialog
+ */
 export default class ConfigurableDialog extends Dialog {
+  /**
+   * Creates a row of fields for the dialog.
+   * @param {object[]} fields - The fields to include in the row.
+   * @param {number} rowIndex - The index of the row.
+   * @returns {string} The HTML string for the row.
+   */
   static createRow(fields, rowIndex) {
     let style = `style="max-width: ${Utility.round(100 / fields.length, 0)}%"`;
     return fields
@@ -11,6 +21,13 @@ export default class ConfigurableDialog extends Dialog {
       .join("");
   }
 
+  /**
+   * Creates a cell for a field in the dialog.
+   * @param {object} field - The field to create a cell for.
+   * @param {number} rowIndex - The index of the row.
+   * @param {number} [columnIndex=0] - The index of the column.
+   * @returns {string} The HTML string for the cell.
+   */
   static createCell(field, rowIndex, columnIndex = 0) {
     const fieldId = field?.id ?? `field-${rowIndex}-${columnIndex}`;
     switch (field.type ?? "label") {
@@ -30,6 +47,16 @@ export default class ConfigurableDialog extends Dialog {
     }
   }
 
+  /**
+   * Creates and displays a configurable dialog.
+   * @param title {string} The title of the dialog.
+   * @param data {Array<Array<Object>>} The data for the dialog fields.
+   * @param confirmLabel {string} The label for the confirm button.
+   * @param cancelLabel {string} The label for the cancel button.
+   * @param buttons {Object} The buttons for the dialog.
+   * @param options {Object} The options for the dialog.
+   * @returns {Promise<Dialog>} The created dialog.
+   */
   static async create({
     title,
     data = [],

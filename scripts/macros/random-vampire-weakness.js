@@ -147,13 +147,10 @@ async function submit(html) {
   message += weaknesses
     .map((weakness, index) => `<p><b>Weakness ${index + 1}:</b> ${weakness.value}<br>${weakness.description}</p>`)
     .join("");
-  ChatMessage.create(
-    {
-      content: message,
-      whisper: game.users.filter((u) => u.isGM).map((u) => u.id)
-    },
-    false
-  );
+  ChatMessage.create({
+    content: message,
+    whisper: game.users.filter((u) => u.isGM).map((u) => u.id)
+  });
 }
 
 new Dialog({

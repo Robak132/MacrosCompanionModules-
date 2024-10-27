@@ -22,7 +22,7 @@ function updateActorXP(actor, XP, reason) {
   const XPCurrent = actor?.details?.experience?.current || 0;
   const newXPCurrent = Math.max(XPCurrent + XP, 0);
 
-  actor.awardExp(XP, reason);
+  actor.system.awardExp(XP, reason);
   return game.i18n.format("GMTOOLKIT.AddXP.Success", {
     recipient,
     XPTotal,
@@ -55,6 +55,16 @@ let otherActors = game.actors
   .sort((a, b) => a.character.name.localeCompare(b.character.name));
 
 const options = game.user.getFlag("world", "add-exp-options") ?? {};
+
+if (canvas.tokens.controlled.length) {
+  characterActors.forEach((u, i) => {
+    options.charactersEnabled[i] = canvas.tokens.controlled.some((t) => t.actor._id === u.character._id) ? 1 : 0;
+  });
+  otherActors.forEach((u, i) => {
+    options.othersEnabled[i] = canvas.tokens.controlled.some((t) => t.actor._id === u.character._id) ? 1 : 0;
+  });
+}
+
 let data = [
   [{value: "Players' Characters"}],
   ...characterActors.map((u, i) => {

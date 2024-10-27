@@ -37,13 +37,10 @@ async function submit(html) {
 		<h1>Initial Advantage</h1>
 		<p><b>Players:</b> ${playersAdvantage}</p>
 		<p><b>Enemies:</b> ${enemiesAdvantage}</p>`;
-  ChatMessage.create(
-    {
-      content: chatMsgContent,
-      whisper: game.users.filter((u) => u.isGM).map((u) => u.id)
-    },
-    false
-  );
+  await ChatMessage.create({
+    content: chatMsgContent,
+    whisper: game.users.filter((u) => u.isGM).map((u) => u.id)
+  });
 }
 
 new Dialog({

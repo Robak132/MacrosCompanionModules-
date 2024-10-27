@@ -104,7 +104,7 @@ export async function overrideMarket() {
   );
   libWrapper.register(
     "wfrp4e-macros-and-more",
-    `ActorSheetWfrp4e.prototype._onDropMoney`,
+    `ActorSheetWFRP4e.prototype._onDropMoney`,
     async function (dragData) {
       await onDropMoney.call(this, dragData);
     },
@@ -112,7 +112,7 @@ export async function overrideMarket() {
   );
   libWrapper.register(
     "wfrp4e-macros-and-more",
-    `ActorSheetWfrp4e.prototype._onMoneyIconClicked`,
+    `ActorSheetWFRP4e.prototype._onMoneyIconClicked`,
     async function (ev) {
       await onMoneyIconClicked.call(this, ev);
     },
@@ -120,18 +120,18 @@ export async function overrideMarket() {
   );
   libWrapper.register(
     "wfrp4e-macros-and-more",
-    `ActorSheetWfrp4eNPC.prototype._onNpcIncomeClick`,
+    `ActorSheetWFRP4eNPC.prototype._onNpcIncomeClick`,
     async function (event) {
       await onNpcIncomeClick.call(this, event);
     },
     "OVERRIDE"
   );
 
-  for (let method of Utility.getMethods(MarketWfrp4e)) {
+  for (let method of Utility.getMethods(MarketWFRP4e)) {
     Utility.log(`Registering ${method}`);
     libWrapper.register(
       "wfrp4e-macros-and-more",
-      `MarketWfrp4e.${method}`,
+      `MarketWFRP4e.${method}`,
       (wrapper, ...args) => {
         if (RobakMarketWfrp4e.hasOwnProperty(method)) return RobakMarketWfrp4e[method].call(this, ...args);
         return wrapper.call(this, ...args);
@@ -250,7 +250,7 @@ async function onNpcIncomeClick(event) {
   await RobakMarketWfrp4e.updateActorsCoins(this.actor, currency, currency.getValue() + amt);
 }
 
-export default class RobakMarketWfrp4e extends MarketWfrp4e {
+export default class RobakMarketWfrp4e extends MarketWFRP4e {
   static get currentRegion() {
     return RobakMarketWfrp4e.regions[game.settings.get("wfrp4e-macros-and-more", "current-region")];
   }

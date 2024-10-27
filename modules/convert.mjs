@@ -50,7 +50,7 @@ export async function addItemContextOptions(html, options) {
       const itemId = header.data("document-id");
       const item = game.items.get(itemId);
       const originalTypeLocalised = localiseItemType(item.type);
-      const options = game.system.template.Item.types
+      const options = Object.keys(CONFIG.Item.dataModels)
         .filter((t) => t !== item.type)
         .sort((a, b) => localiseItemType(a).localeCompare(localiseItemType(b)))
         .map((t) => `<option value="${t}">${localiseItemType(t)}</option>`);
@@ -75,13 +75,19 @@ export async function addItemContextOptions(html, options) {
             icon: '<i class="fas fa-check"></i>',
             label: "Confirm",
             callback: async (html) => {
-              let newItem = item.toObject();
               const convertType = html.find('[name="convert-type"]').val();
-              newItem.type = convertType;
+              let update = {
+                type: convertType
+              };
               if (hasDefaultIcon(item)) {
-                newItem.img = getDefaultIcon(convertType) ?? item.img;
+                update.img = getDefaultIcon(convertType) ?? item.img;
               }
-              await Item.updateDocuments([newItem], {keepId: true});
+              try {
+                await item.update(update);
+              } catch (e) {
+                // Ignoring error
+              }
+              window.debouncedReload();
             }
           }
         },
@@ -100,7 +106,7 @@ export async function addActorContextOptions(html, options) {
       const documentId = header.data("document-id");
       const actor = game.actors.get(documentId);
       const originalTypeLocalised = localiseActorType(actor.type);
-      const options = game.system.template.Actor.types
+      const options = Object.keys(CONFIG.Actor.dataModels)
         .filter((t) => t !== actor.type)
         .sort((a, b) => localiseActorType(a).localeCompare(localiseActorType(b)))
         .map((t) => `<option value="${t}">${localiseActorType(t)}</option>`);
@@ -125,9 +131,15 @@ export async function addActorContextOptions(html, options) {
             icon: '<i class="fas fa-check"></i>',
             label: "Confirm",
             callback: async (html) => {
-              let newActor = actor.toObject();
-              newActor.type = html.find('[name="convert-type"]').val();
-              await Actor.updateDocuments([newActor], {keepId: true});
+              const convertType = html.find('[name="convert-type"]').val();
+              try {
+                await actor.update({
+                  type: convertType
+                });
+              } catch (e) {
+                // Ignoring error
+              }
+              window.debouncedReload();
             }
           }
         },
