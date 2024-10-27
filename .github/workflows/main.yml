@@ -32,14 +32,14 @@ jobs:
         id: minimum
         uses: notiz-dev/github-action-json-property@release
         with:
-          path: './dist/module.json'
+          path: 'module.json'
           prop_path: 'compatibility.minimum'
 
       - name: Get Verified
         id: verified
         uses: notiz-dev/github-action-json-property@release
         with:
-          path: './dist/module.json'
+          path: 'module.json'
           prop_path: 'compatibility.verified'
 
       - name: Substitute Manifest and Download Links For Versioned Ones
