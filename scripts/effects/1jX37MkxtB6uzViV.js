@@ -15,7 +15,7 @@ for (let weapon of this.actor.itemTypes.weapon ?? []) {
     effectsToDelete.push(effect._id);
   }
 }
-await this.actor.createEmbeddedDocuments("ActiveEffect", effectsToCreate);
+this.actor.createEmbeddedDocuments("ActiveEffect", effectsToCreate);
 if (effectsToDelete.length) {
-  await this.actor.deleteEmbeddedDocuments("ActiveEffect", effectsToDelete);
+  this.actor.deleteEmbeddedDocuments("ActiveEffect", effectsToDelete);
 }

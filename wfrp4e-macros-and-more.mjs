@@ -152,7 +152,13 @@ Hooks.on("getItemDirectoryEntryContext", addItemContextOptions);
 
 Hooks.on("getActorDirectoryEntryContext", addActorContextOptions);
 
-Hooks.on("renderActorSheetWfrp4e", (sheet, html, _) => ItemTransfer.setupItemHandler(sheet, html));
+Hooks.on("renderActorSheetWFRP4eCharacter", (sheet, html, _) => ItemTransfer.setupItemHandler(sheet, html));
+
+Hooks.on("renderActorSheetWFRP4eCreature", (sheet, html, _) => ItemTransfer.setupItemHandler(sheet, html));
+
+Hooks.on("renderActorSheetWFRP4eNPC", (sheet, html, _) => ItemTransfer.setupItemHandler(sheet, html));
+
+Hooks.on("renderActorSheetWFRP4eVehicle", (sheet, html, _) => ItemTransfer.setupItemHandler(sheet, html));
 
 Hooks.on("renderChatLog", (log, html) => {
   html.on("click", ".unstable-actor", async (event) => {
