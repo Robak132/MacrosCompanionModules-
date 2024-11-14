@@ -5,8 +5,8 @@ export default class ItemTransfer {
     if (!game.settings.get("wfrp4e-macros-and-more", "transfer-item-gui")) return;
 
     let link = '<a class="item-control item-transfer" title="Transfer Item"><i class="fas fa-hands-helping"></i></a>';
-    $(link).insertAfter(html.find(".inventory-list .item-post"));
-    $(link).insertBefore(html.find(".inventory-list .item-remove"));
+    $(link).insertAfter(html.find(".inventory .inventory-list .item-post"));
+    $(link).insertBefore(html.find(".inventory .inventory-list .item-remove"));
     html.find(".item-control.item-transfer").on("click", ItemTransfer.transferItemHandler.bind(sheet.actor));
   }
 
@@ -24,7 +24,10 @@ export default class ItemTransfer {
       } else if (!game.users.find((u) => u.active && u.isGM)) {
         return ui.notifications.error("You cannot offer item to other player's actor when is GM not present");
       } else {
-        await SocketHandlers.transferItem(transferObject);
+        await game.socket.emit(`module.wfrp4e-macros-and-more`, {
+          type: "transferItem",
+          payload: transferObject
+        });
       }
 
       if (transferObject.sourceActorId === transferObject.targetActorId) {

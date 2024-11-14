@@ -121,16 +121,17 @@ Hooks.once("init", async function () {
       foundry.utils.mergeObject(game.wfrp4e.config.effectScripts, effects);
     });
 
-  SocketHandlers.transferItem = async function (data) {
-    Utility.log("Received transfer object", data);
+  game.socket.on(`module.wfrp4e-macros-and-more`, (data) => {
     if (!game.user.isUniqueGM) return;
-    return ItemTransfer.handleTransfer(data);
-  };
-  SocketHandlers.darkWhispers = async function (data) {
-    Utility.log("Received dark whispers", data);
-    if (!game.user.isUniqueGM) return;
-    return Utility.darkWhispersDialog(data);
-  };
+    switch (data.type) {
+      case "transferItem":
+        Utility.log("Received transfer object", data);
+        return ItemTransfer.handleTransfer(data.payload);
+      case "darkWhispers":
+        Utility.log("Received dark whispers", data);
+        return Utility.darkWhispersDialog(data.payload);
+    }
+  });
 });
 
 Hooks.on("updateCombat", async (combat, updates, _, __) => {
