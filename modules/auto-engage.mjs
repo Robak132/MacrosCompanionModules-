@@ -2,7 +2,7 @@
 // https://github.com/silentmark/wfrp4e-pl-addons/blob/main/scripts/auto-engaged.mjs
 
 export function setupAutoEngaged() {
-  game.wfrp4e.socket.addCondition = async function (payload) {
+  SocketHandlers.addCondition = async function (payload) {
     let condition = payload.condition;
     let actorId = payload.actorId;
     let actor = game.actors.get(actorId);
@@ -128,7 +128,7 @@ export function setupAutoEngaged() {
         tokens.forEach((t) => t.actor.addCondition("engaged"));
       } else {
         tokens.forEach((t) =>
-          game.wfrp4e.socket.executeOnOwner(t.actor, "addCondition", {condition: "engaged", actorId: t.actor.id})
+          SocketHandlers.executeOnOwner(t.actor, "addCondition", {condition: "engaged", actorId: t.actor.id})
         );
       }
     }
@@ -142,7 +142,7 @@ export function setupAutoEngaged() {
         tokens.forEach((t) => t.actor.addCondition("engaged"));
       } else {
         tokens.forEach((t) =>
-          game.wfrp4e.socket.executeOnOwner(t.actor, "addCondition", {condition: "engaged", actorId: t.actor.id})
+          SocketHandlers.executeOnOwner(t.actor, "addCondition", {condition: "engaged", actorId: t.actor.id})
         );
       }
     }

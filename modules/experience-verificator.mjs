@@ -181,7 +181,7 @@ export default class ExperienceVerificator extends FormApplication {
   }
 
   static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(super.defaultOptions, {
       id: "macro-and-more-verificator",
       template: "modules/wfrp4e-macros-and-more/templates/experience-verificator.hbs",
       width: 900,

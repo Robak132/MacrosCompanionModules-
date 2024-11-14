@@ -30,7 +30,7 @@ async function registerSettings() {
     hint: "Enables advanced currency handling in Pay/Credit commands.",
     scope: "world",
     config: true,
-    onChange: debouncedReload,
+    onChange: foundry.utils.debouncedReload,
     default: false,
     restricted: true,
     type: Boolean
@@ -41,7 +41,7 @@ async function registerSettings() {
     scope: "world",
     config: true,
     default: "empire",
-    onChange: debouncedReload,
+    onChange: foundry.utils.debouncedReload,
     restricted: true,
     choices: RobakMarketWfrp4e.getKeyValueRegions(),
     type: String
@@ -51,7 +51,7 @@ async function registerSettings() {
     hint: "Automatically set 'Engaged' condition when rolling attacks.",
     scope: "world",
     config: true,
-    onChange: debouncedReload,
+    onChange: foundry.utils.debouncedReload,
     default: false,
     restricted: true,
     type: Boolean
@@ -62,7 +62,7 @@ async function registerSettings() {
     hint: "MACROS-AND-MORE.SettingsMaintenanceMenuHint",
     icon: "fas fa-cog",
     type: MaintenanceWrapper,
-    onChange: debouncedReload,
+    onChange: foundry.utils.debouncedReload,
     restricted: true
   });
 }
@@ -118,27 +118,19 @@ Hooks.once("init", async function () {
   await fetch("modules/wfrp4e-macros-and-more/packs/effects.json")
     .then((r) => r.json())
     .then(async (effects) => {
-      mergeObject(game.wfrp4e.config.effectScripts, effects);
+      foundry.utils.mergeObject(game.wfrp4e.config.effectScripts, effects);
     });
-});
 
-Hooks.once("babele.ready", async () => {
-  game.socket.on("module.wfrp4e-macros-and-more", async ({type, data}) => {
+  SocketHandlers.transferItem = async function (data) {
     Utility.log("Received transfer object", data);
-    if (!game.user.isUniqueGM) {
-      return;
-    }
-    switch (type) {
-      case "transferItems":
-        return ItemTransfer.handleTransfer(data);
-      case "darkWhispers":
-        await Utility.darkWhispersDialog(data);
-    }
-  });
-});
-
-Hooks.once("devModeReady", ({registerPackageDebugFlag}) => {
-  registerPackageDebugFlag("wfrp4e-macros-and-more");
+    if (!game.user.isUniqueGM) return;
+    return ItemTransfer.handleTransfer(data);
+  };
+  SocketHandlers.darkWhispers = async function (data) {
+    Utility.log("Received dark whispers", data);
+    if (!game.user.isUniqueGM) return;
+    return Utility.darkWhispersDialog(data);
+  };
 });
 
 Hooks.on("updateCombat", async (combat, updates, _, __) => {

@@ -87,7 +87,7 @@ export async function addItemContextOptions(html, options) {
               } catch (e) {
                 // Ignoring error
               }
-              window.debouncedReload();
+              window.foundry.utils.debouncedReload();
             }
           }
         },
@@ -139,7 +139,7 @@ export async function addActorContextOptions(html, options) {
               } catch (e) {
                 // Ignoring error
               }
-              window.debouncedReload();
+              window.foundry.utils.debouncedReload();
             }
           }
         },

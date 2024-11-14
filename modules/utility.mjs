@@ -94,10 +94,6 @@ export default class Utility {
     }
   };
 
-  static async sendMessage(type, data) {
-    return game.socket.emit("module.wfrp4e-macros-and-more", {type, data});
-  }
-
   static async darkWhispersDialog(data) {
     await new Dialog({
       title: `New Whisper from Dark Gods`,
@@ -234,7 +230,7 @@ export default class Utility {
   }
 
   static isOwner(actor) {
-    return this.checkOwnership(actor, this.#OWNERSHIP_OWNER);
+    return game.user.isGM || this.checkOwnership(actor, this.#OWNERSHIP_OWNER);
   }
 
   static checkOwnership(actor, ownership) {
@@ -249,7 +245,7 @@ export default class Utility {
   }
 
   static getStashableActors() {
-    let actors = game.actors.filter((a) => a.hasPlayerOwner).filter((a) => this.isOwner(a));
+    let actors = game.actors.filter((a) => a.hasPlayerOwner).filter((a) => game.user.isGM || this.isOwner(a));
     if (game.user.character !== null) {
       actors = actors.sort((a) => (a.id === game.user.character.id ? -1 : 1));
     }
@@ -259,7 +255,7 @@ export default class Utility {
   static getTransferableActors() {
     return game.actors
       .filter((a) => a.hasPlayerOwner)
-      .filter((a) => this.checkOwnership(a, this.#OWNERSHIP_LIMITED) && !this.checkOwnership(a, this.#OWNERSHIP_OWNER));
+      .filter((a) => this.checkOwnership(a, this.#OWNERSHIP_LIMITED) && !this.isOwner(a));
   }
 
   static getContainers(actor) {

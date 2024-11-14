@@ -36,7 +36,7 @@ export default class CurrencyApp extends FormApplication {
   }
 
   static get defaultOptions() {
-    const options = mergeObject(super.defaultOptions, {
+    const options = foundry.utils.mergeObject(super.defaultOptions, {
       id: "currency-app",
       title: "Select currency to pay",
       resizable: false,

@@ -19,15 +19,12 @@ export default class ItemTransfer {
   static async transferItems(transferObjects) {
     const groupedObjects = [];
     for (const transferObject of transferObjects) {
-      if (
-        Utility.isOwner(game.actors.get(transferObject.sourceActorId)) &&
-        Utility.isOwner(game.actors.get(transferObject.targetActorId))
-      ) {
+      if (game.user.isGM) {
         await this.handleTransfer(transferObject);
       } else if (!game.users.find((u) => u.active && u.isGM)) {
         return ui.notifications.error("You cannot offer item to other player's actor when is GM not present");
       } else {
-        await Utility.sendMessage("transferItems", transferObject);
+        await SocketHandlers.transferItem(transferObject);
       }
 
       if (transferObject.sourceActorId === transferObject.targetActorId) {
@@ -69,7 +66,7 @@ export default class ItemTransfer {
   static async handleTransfer({item, targetActorId, targetContainerId, sourceActorId, sourceContainerId, quantity}) {
     const sourceActor = game.actors.get(sourceActorId);
     const targetActor = game.actors.get(targetActorId);
-    let updatedItem = duplicate(item);
+    let updatedItem = foundry.utils.duplicate(item);
 
     // Global Transfer
     if (sourceActorId !== targetActorId || item.system.quantity.value !== quantity) {
@@ -83,7 +80,7 @@ export default class ItemTransfer {
           quantity: foundItem.system.quantity.value + quantity
         });
       } else {
-        const createdItem = duplicate(item);
+        const createdItem = foundry.utils.duplicate(item);
         createdItem.system.quantity.value = quantity;
         createdItem.system.location.value = "";
 
@@ -150,8 +147,8 @@ export default class ItemTransfer {
 
   static #findItems(sourceItem, actor, quantity, containerId) {
     for (const actorItem of actor.items) {
-      const dupActorItem = duplicate(actorItem);
-      const dupSourceItem = duplicate(sourceItem);
+      const dupActorItem = foundry.utils.duplicate(actorItem);
+      const dupSourceItem = foundry.utils.duplicate(sourceItem);
 
       if (dupActorItem.name !== dupSourceItem.name) {
         continue;

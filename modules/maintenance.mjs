@@ -18,7 +18,7 @@ export default class MaintenanceWrapper extends FormApplication {
   }
 
   static get defaultOptions() {
-    return mergeObject(super.defaultOptions, {
+    return foundry.utils.mergeObject(super.defaultOptions, {
       id: "macro-and-more-maintenance",
       title: "Maintenance",
       template: "modules/wfrp4e-macros-and-more/templates/maintenance.hbs",
