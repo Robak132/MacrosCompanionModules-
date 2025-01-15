@@ -735,7 +735,7 @@ class SimplePursuit {
       this.renderNextTurnDialog();
     }
     if (this.POST_TO_CHAT) {
-      ChatMessage.create({content}, false);
+      await ChatMessage.create({content});
     }
   }
 
