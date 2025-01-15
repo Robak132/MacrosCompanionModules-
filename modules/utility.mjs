@@ -184,13 +184,14 @@ export default class Utility {
   static isObjectEqual(x, y, ignore, path = []) {
     const result = this.#isObjectEqualRaw(x, y, ignore, path);
     if (!result) {
-      this.debug(`${JSON.stringify(x)} vs ${JSON.stringify(y)}: false`);
+      this.debug(`${path.join(".")}: ${JSON.stringify(x)} vs ${JSON.stringify(y)}: false`);
     }
     return result;
   }
 
   static #isObjectEqualRaw(x, y, ignore, path = []) {
-    if (ignore.includes(path.join(".")) || x === y) {
+    let joinedPath = path.join(".");
+    if (ignore.find((v) => v === joinedPath || joinedPath.startsWith(`${v}.`)) || x === y) {
       return true;
     }
     if (typeof x === "object" && x != null && typeof y === "object" && y != null) {
@@ -229,6 +230,11 @@ export default class Utility {
     return Math.round(num * factor) / factor;
   }
 
+  static floor(num, spaces) {
+    const factor = Math.pow(10, spaces);
+    return Math.floor(num * factor) / factor;
+  }
+
   static isOwner(actor) {
     return game.user.isGM || this.checkOwnership(actor, this.#OWNERSHIP_OWNER);
   }
@@ -256,6 +262,20 @@ export default class Utility {
     return game.actors
       .filter((a) => a.hasPlayerOwner)
       .filter((a) => this.checkOwnership(a, this.#OWNERSHIP_LIMITED) && !this.isOwner(a));
+  }
+
+  /**
+   * Groups a list of items by a specified function.
+   * @param {object[]} list - The list of items.
+   * @param {Function} func - The function to group by.
+   * @returns {object} - The grouped items.
+   */
+  static groupBy(list, func) {
+    return list.reduce((rv, x) => {
+      rv[func(x)] = rv[func(x)] ?? [];
+      rv[func(x)].push(x);
+      return rv;
+    }, {});
   }
 
   static getContainers(actor) {

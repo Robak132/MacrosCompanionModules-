@@ -1,0 +1,115 @@
+<form>
+  <div style="height: 450px; display: flex; flex-direction: column;position: relative;">
+    <div style="display: flex;justify-content: space-between;">
+      <div style="flex: 1" class="form-group">
+        <select id="leftPageSelect"
+                style="text-align: center;font-family: CaslonAntique,serif;font-variant: small-caps;font-weight: bold">
+          {{#select leftActorIndex}}
+            {{#each actors as |a i|}}
+              <option value="{{i}}" {{#if (intCompare ../rightActorIndex i)}} disabled {{/if}}>{{a.nameUpperCase}}
+                ({{a.currentEnc}}/{{a.maxEnc}})
+              </option>
+            {{/each}}
+          {{/select}}
+        </select>
+      </div>
+      <div style="flex: 1" class="form-group">
+        <select id="rightPageSelect"
+                style="text-align: center;font-family: CaslonAntique,serif;font-variant: small-caps;font-weight: bold">
+          {{#select rightActorIndex}}
+            {{#each actors as |a i|}}
+              <option value="{{i}}" {{#if (intCompare ../leftActorIndex i)}} disabled {{/if}}>{{a.nameUpperCase}}
+                ({{a.currentEnc}}/{{a.maxEnc}})
+              </option>
+            {{/each}}
+          {{/select}}
+        </select>
+      </div>
+    </div>
+    <div style="display: flex; height: 100%; flex-direction: row; align-items: stretch;">
+      <!-- Left Page -->
+      <div style="flex: 1; height: 100%; overflow: auto; display: flex; flex-direction: column;" data-source-actor-id="{{leftActor.id}}">
+        <div class="actor-inventory" data-source-container-id="">
+          {{#each leftActor.noContainerItems as |item|}}
+            <div class="actor-inventory-entry form-group" data-item-id="{{item.id}}">
+              <img style="max-width: 25px;text-align: center" src="{{item.img}}">
+              <span style="max-width: 10%;text-align: center">{{item.quantity}}</span>
+              <span style="text-align: center">{{item.name}}</span>
+              <span style="max-width: 15%;text-align: center">{{item.encumbranceFormatted}}</span>
+            </div>
+          {{/each}}
+        </div>
+        {{#each leftActor.containers as |container|}}
+        <div class="actor-inventory" data-source-container-id="{{container.id}}">
+          <div class="form-group"
+               style="font-size: 1.5em;border-bottom: 1px solid var(--color-underline-header);border-top: 1px solid var(--color-underline-header);">
+            <img style="max-width: 25px;text-align: center" src="{{container.img}}">
+            <span style="max-width: 10%"></span>
+            <span
+              style="text-align: center;font-family: CaslonAntique,serif;font-variant: small-caps;font-weight: bold;">
+            {{container.name}} ({{container.carriesCurrent}}/{{container.carriesMax}})
+          </span>
+            <span
+              style="max-width: 15%;text-align: center;font-family: CaslonAntique,serif;">{{container.encumbranceFormatted}}</span>
+          </div>
+          {{#each container.items as |item|}}
+            <div class="actor-inventory-entry form-group" data-item-id="{{item.id}}">
+              <img style="max-width: 25px;text-align: center" src="{{item.img}}">
+              <span style="max-width: 10%;text-align: center">{{item.quantity}}</span>
+              <span style="text-align: center">{{item.name}}</span>
+              <span style="max-width: 15%;text-align: center">{{item.encumbranceFormatted}}</span>
+            </div>
+            {{/each}}
+          </div>
+        {{/each}}
+      </div>
+      <!-- Right Page -->
+      <div style="flex: 1; height: 100%; overflow: auto; display: flex; flex-direction: column;" data-source-actor-id="{{rightActor.id}}">
+        <div class="actor-inventory" data-source-container-id="">
+          {{#each rightActor.noContainerItems as |item|}}
+            <div class="actor-inventory-entry form-group" data-item-id="{{item.id}}">
+              <img style="max-width: 25px;text-align: center" src="{{item.img}}">
+              <span style="max-width: 10%;text-align: center">{{item.quantity}}</span>
+              <span style="text-align: center">{{item.name}}</span>
+              <span style="max-width: 15%;text-align: center">{{item.encumbranceFormatted}}</span>
+            </div>
+          {{/each}}
+        </div>
+        {{#each rightActor.containers as |container|}}
+        <div class="actor-inventory" data-source-container-id="{{container.id}}">
+          <div class="form-group"
+               style="font-size: 1.5em;border-bottom: 1px solid var(--color-underline-header);border-top: 1px solid var(--color-underline-header);">
+            <img style="max-width: 25px;text-align: center" src="{{container.img}}">
+            <span style="max-width: 10%"></span>
+            <span
+              style="text-align: center;font-family: CaslonAntique,serif;font-variant: small-caps;font-weight: bold;">
+            {{container.name}} ({{container.carriesCurrent}}/{{container.carriesMax}})
+          </span>
+            <span
+              style="max-width: 15%;text-align: center;font-family: CaslonAntique,serif;">{{container.encumbranceFormatted}}</span>
+          </div>
+          {{#each container.items as |item|}}
+            <div class="actor-inventory-entry form-group" data-item-id="{{item.id}}">
+              <img style="max-width: 25px;text-align: center" src="{{item.img}}">
+              <span style="max-width: 10%;text-align: center">{{item.quantity}}</span>
+              <span style="text-align: center">{{item.name}}</span>
+              <span style="max-width: 15%;text-align: center">{{item.encumbranceFormatted}}</span>
+            </div>
+          {{/each}}
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    <div style="display: flex;justify-content: space-between;">
+      <div style="flex: 1" class="form-group">
+        <button type="submit">Submit</button>
+      </div>
+      <div style="flex: 1" class="form-group">
+        <button type="button">Reset</button>
+      </div>
+      <div style="flex: 1" class="form-group">
+        <button type="reset">Cancel</button>
+      </div>
+    </div>
+  </div>
+</form>

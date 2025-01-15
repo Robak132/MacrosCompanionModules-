@@ -7,6 +7,7 @@ import RobakMarketWfrp4e, {overrideMarket} from "./modules/market.mjs";
 import ExperienceVerificator from "./modules/experience-verificator.mjs";
 import ConfigurableDialog from "./modules/configurable-dialog.mjs";
 import {setupAutoEngaged} from "./modules/auto-engage.mjs";
+import InventoryManager from "./modules/inventory-manager.mjs";
 
 async function registerSettings() {
   await game.settings.register("wfrp4e-macros-and-more", "transfer-item-gui", {
@@ -69,6 +70,7 @@ async function registerSettings() {
 
 async function registerHandlebars() {
   await Handlebars.registerHelper("isOne", (value) => value === 1);
+  await Handlebars.registerHelper("intCompare", (a, b) => parseInt(a) === parseInt(b));
   await Handlebars.registerHelper("isTwo", (value) => value === 2);
   await Handlebars.registerHelper("isThreePlus", (value) => value > 2);
   await Handlebars.registerHelper("isTie", (value) => value.length > 1);
@@ -91,6 +93,7 @@ Hooks.once("init", async function () {
     transferItem: ItemTransfer,
     maintenance: MaintenanceWrapper,
     experienceVerificator: ExperienceVerificator,
+    inventoryManager: InventoryManager,
     utils: Utility,
     configurableDialog: ConfigurableDialog
   };

@@ -1,7 +1,7 @@
 {
   "_id": "igrp0A9gr5qXXnbK",
   "author": "MJAZjdKh3QKREKG2",
-  "command": "new game.robakMacros.maintenance().render(true);",
+  "command": "new game.robakMacros.maintenance().render(true);\n",
   "flags": {
     "wfrp4e-macros-and-more": {
       "version": "1.0.0",

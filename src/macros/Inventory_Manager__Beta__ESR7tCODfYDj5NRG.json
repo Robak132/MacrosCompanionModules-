@@ -1,0 +1,17 @@
+{
+  "_id": "ESR7tCODfYDj5NRG",
+  "author": "MJAZjdKh3QKREKG2",
+  "command": "new game.robakMacros.inventoryManager().render(true);\n",
+  "flags": {
+    "wfrp4e-macros-and-more": {
+      "version": "2.0.0",
+      "sourceId": "ESR7tCODfYDj5NRG"
+    }
+  },
+  "folder": null,
+  "img": "modules/wfrp4e-macros-and-more/assets/icons/inventory-manager.svg",
+  "name": "Inventory Manager (Beta)",
+  "scope": "global",
+  "type": "script",
+  "_key": "!macros!ESR7tCODfYDj5NRG"
+}

@@ -74,7 +74,7 @@ export default class ItemTransfer {
     // Global Transfer
     if (sourceActorId !== targetActorId || item.system.quantity.value !== quantity) {
       Utility.log(`Adding ${updatedItem._id} to ${targetActorId} (${targetContainerId})`);
-      const foundItem = this.#findItems(item, targetActor, quantity, targetContainerId);
+      const foundItem = this.findItems(item, targetActor, quantity, targetContainerId);
       if (foundItem) {
         Utility.log(`Duplicate found: ${foundItem._id}`);
         updatedItem = await this.#updateItem({
@@ -101,7 +101,7 @@ export default class ItemTransfer {
     // Local Transfer
     if (sourceActorId === targetActorId || (sourceActorId !== targetActorId && targetContainerId !== "")) {
       Utility.log(`Transfer ${updatedItem._id} from ${sourceContainerId} to ${targetContainerId}`);
-      const foundItem = this.#findItems(updatedItem, targetActor, quantity, targetContainerId);
+      const foundItem = this.findItems(updatedItem, targetActor, quantity, targetContainerId);
       if (foundItem) {
         Utility.log(`Duplicate found: ${foundItem._id}`);
         await this.#updateItem({
@@ -148,7 +148,7 @@ export default class ItemTransfer {
     }
   }
 
-  static #findItems(sourceItem, actor, quantity, containerId) {
+  static findItems(sourceItem, actor, quantity, containerId) {
     for (const actorItem of actor.items) {
       const dupActorItem = foundry.utils.duplicate(actorItem);
       const dupSourceItem = foundry.utils.duplicate(sourceItem);
