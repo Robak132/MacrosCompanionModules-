@@ -15,6 +15,11 @@
  */
 
 class ConsumeAlcohol extends Dialog {
+  constructor(data, options) {
+    super(data, options);
+    this.targets = data.targets;
+  }
+
   /**
    * Counts the number of alcohol consumption failures for the given actor.
    * @param {Object} actor - The actor whose failures are being counted.
@@ -34,7 +39,7 @@ class ConsumeAlcohol extends Dialog {
    * Adds or updates the alcohol consumption modifiers for the given actor.
    * @param {Object} actor - The actor to whom the modifiers are being added.
    */
-  async addModifiers(actor) {
+  async addModifier(actor) {
     const failures = this.countFailures(actor);
     if (failures === 0) {
       actor.addSystemEffect("consumealcohol1");
@@ -56,33 +61,61 @@ class ConsumeAlcohol extends Dialog {
   }
 
   /**
-   * Consumes the specified beverage for the selected characters.
-   * @param {Beverage} beverage - The beverage being consumed.
+   *
+   * @param {Object} actor
    */
-  async consumeAlcohol(beverage) {
-    let characters = [];
-    if (game.user.character) {
-      // Get player's main character
-      characters.push(game.user.character);
-    } else if (canvas.tokens.controlled.length) {
-      // Get selected characters
-      characters = canvas.tokens.controlled.map((t) => t.actor);
-    } else {
-      return ui.notifications.error("Select one or more characters on which you want to run this macro");
-    }
+  async removeModifier(actor) {
+    const failures = this.countFailures(actor);
+    if (failures === 0) return;
 
-    for (const actor of characters) {
-      if (beverage.id === "no_roll") return await this.addModifiers(actor);
-      for (let i = 0; i < beverage.tests; i++) {
-        const test = await actor.setupSkill(game.i18n.localize("NAME.ConsumeAlcohol"), {
-          fields: {
-            difficulty: beverage.strength
+    if (failures === 1) {
+      actor.removeSystemEffect("consumealcohol1");
+    } else if (failures <= 3) {
+      actor.removeSystemEffect(`consumealcohol${failures}`);
+      actor.addSystemEffect(`consumealcohol${failures - 1}`);
+    } else {
+      const effect = actor.effects.find((e) => e.conditionId === "consumealcohol3" && e.disabled === true);
+      if (effect) {
+        await actor.deleteEmbeddedDocuments("ActiveEffect", [effect.id]);
+      }
+    }
+  }
+
+  /**
+   * Consumes the specified beverage for the selected characters.
+   * @param {string} selectedOptionId - The ID of the selected option.
+   */
+  async consumeAlcohol(selectedOptionId) {
+    for (let actor of this.targets) {
+      switch (selectedOptionId) {
+        case "increase":
+          await this.addModifier(actor);
+          break;
+        case "reduce":
+          await this.removeModifier(actor);
+          break;
+        case "remove_all":
+          const effects = actor.effects.filter((e) => e.conditionId?.startsWith("consumealcohol")).map((e) => e.id);
+          await actor.deleteEmbeddedDocuments("ActiveEffect", effects);
+          break;
+        default:
+          let beverage = ConsumeAlcohol.BEVERAGES.find((b) => b.id === selectedOptionId);
+          let userId = game.users.find((u) => u.character?.id === actor.id)?.id ?? "GM";
+          for (let i = 0; i < beverage.tests; i++) {
+            const test = await SocketHandlers.sendRollToUserAndWait(
+              userId,
+              actor.id,
+              game.i18n.localize("NAME.ConsumeAlcohol"),
+              {
+                fields: {
+                  difficulty: beverage.difficulty
+                }
+              }
+            );
+            if (test.data.result.outcome === "failure") {
+              await this.addModifier(actor);
+            }
           }
-        });
-        await test.roll();
-        if (test.result.outcome === "failure") {
-          await this.addModifiers(actor);
-        }
       }
     }
   }
@@ -139,19 +172,25 @@ class ConsumeAlcohol extends Dialog {
       strength: "Test (+0) per shot",
       tests: 1,
       description: "Spirits are distilled alcoholic beverages, much stronger than beer or wine."
-    },
-    {
-      id: "no_roll",
-      name: "No Roll",
-      strength: "",
-      description: "Just adds the modifiers without rolling."
     }
   ];
 
+  /** @return {object[] | void} */
+  static selectTargets() {
+    const targets = game.user.targets.size ? game.user.targets : canvas.tokens.controlled;
+    let actors = targets.map((t) => t.actor).filter((t) => t.type === "character" || t.type === "npc");
+    if (!actors.length && game.user.character) actors = [game.user.character];
+    actors = actors.filter((a) => a.type === "character" || a.type === "npc");
+    return actors.length ? actors : null;
+  }
+
   static async run() {
-    return await this.wait(
+    let targets = ConsumeAlcohol.selectTargets();
+    if (!targets) return ui.notifications.error("Select one or more characters on which you want to run this macro");
+    new ConsumeAlcohol(
       {
-        title: "Determine Beverage",
+        title: "Consume Alcohol Helper",
+        targets,
         content: `<div class="directory">
             <ol class="directory-list">
               ${ConsumeAlcohol.BEVERAGES.map((item) => {
@@ -162,6 +201,23 @@ class ConsumeAlcohol extends Dialog {
                   </li></a>`;
               }).join("")}
             </ol>
+            <hr>
+            <ol class="directory-list">
+              <a><li style="align-items: center;justify-content: center;display: flex" class="document flexrow" data-id="increase">
+                <h4 style="flex: 3"><b>Increase modifier</b></h4>
+                <h4 style="flex: 3"></h4>
+                <h4 style="flex: 5">Increase level of 'Consume Alcohol' modfier.</h4>
+              </li></a>
+              <a><li style="align-items: center;justify-content: center;display: flex" class="document flexrow" data-id="reduce">
+                <h4 style="flex: 3"><b>Reduce modifier</b></h4>
+                <h4 style="flex: 3"></h4>
+                <h4 style="flex: 5">Reduces level of 'Consume Alcohol' modfier.</h4>
+              </li></a>
+              <a><li style="align-items: center;justify-content: center;display: flex" class="document flexrow" data-id="remove_all">
+                <h4 style="flex: 3"><b>Remove all modifiers</b></h4>
+                <h4 style="flex: 3"></h4>
+                <h4 style="flex: 5">Removes all 'Consume Alcohol' modifiers.</h4>
+              </li></a>
           </div>`,
         buttons: [],
         close: () => null
@@ -169,16 +225,16 @@ class ConsumeAlcohol extends Dialog {
       {
         width: 600
       }
-    );
+    ).render(true);
   }
 
   activateListeners(html) {
     super.activateListeners(html);
     html.on("click", ".document", async (ev) => {
-      let beverage = ConsumeAlcohol.BEVERAGES.find((b) => b.id === ev.currentTarget.dataset.id);
-      await this.consumeAlcohol(beverage);
+      await this.close();
+      await this.consumeAlcohol(ev.currentTarget.dataset.id);
     });
   }
 }
 
-await ConsumeAlcohol.run();
+ConsumeAlcohol.run();

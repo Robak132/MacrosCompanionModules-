@@ -121,6 +121,16 @@ Hooks.once("init", async function () {
       foundry.utils.mergeObject(game.wfrp4e.config.effectScripts, effects);
     });
 
+  SocketHandlers.sendRollToUserAndWait = async function (userId, actorId, skill, options) {
+    return await SocketHandlers.executeOnUserAndWait(userId, "rollSkill", {actorId, skill, options});
+  };
+  SocketHandlers.rollSkill = async function ({actorId, skill, options}) {
+    let actor = game.actors.get(actorId);
+    let test = await actor.setupSkill(skill, options);
+    await test.roll();
+    return test;
+  };
+
   game.socket.on(`module.wfrp4e-macros-and-more`, (data) => {
     if (!game.user.isUniqueGM) return;
     switch (data.type) {
@@ -156,6 +166,7 @@ Hooks.on("renderActorSheetWFRP4eVehicle", (sheet, html, _) => ItemTransfer.setup
 Hooks.on("renderChatLog", (log, html) => {
   html.on("click", ".unstable-actor", async (event) => {
     event.preventDefault();
+    if (!game.user.isGM) return;
     const dmg = Number.fromString($(event.currentTarget).attr("data-damage"));
     const actor = canvas.tokens.get($(event.currentTarget).attr("data-token")).actor;
     await actor.applyBasicDamage(dmg, {damageType: game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL});
